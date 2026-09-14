@@ -141,3 +141,12 @@ dist
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 .vite/
+
+/generated/prisma
+
+# AI agent skills
+.agents/*
+!.agents/rules/
+.cursor/
+.claude/
+.windsurf/
