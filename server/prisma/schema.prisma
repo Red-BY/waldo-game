@@ -11,3 +11,13 @@ generator client {
 datasource db {
   provider = "postgresql"
 }
+
+model CharacterLocation {
+  id          Int    @id @default(autoincrement())
+  boardName   String
+  characterName String
+  x1          Float
+  y1          Float
+  x2          Float
+  y2          Float
+}
