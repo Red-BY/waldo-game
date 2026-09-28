@@ -1,5 +1,9 @@
 {
 	"type": "module",
+	"scripts": {
+		"add-character-location": "tsx scripts/add-character-location.ts",
+		"migrate": "bash scripts/migrate.sh"
+	},
 	"devDependencies": {
 		"@types/express": "^5.0.6",
 		"@types/express-session": "^1.19.0",
