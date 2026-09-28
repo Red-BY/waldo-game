@@ -1,6 +1,7 @@
 {
 	"type": "module",
 	"scripts": {
+		"start": "tsx app.ts",
 		"add-character-location": "tsx scripts/add-character-location.ts",
 		"migrate": "bash scripts/migrate.sh"
 	},

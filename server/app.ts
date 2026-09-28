@@ -3,6 +3,7 @@ import path from "node:path";
 import { loadEnvFile } from "node:process";
 import session from "express-session";
 import passport from "passport";
+import boardsRouter from "./routes/boardsRouter.js";
 
 const app = express();
 
@@ -15,6 +16,8 @@ app.use(session({ secret: "cats", resave: false, saveUninitialized: false }));
 app.use(passport.session());
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
+
+app.use("/boards", boardsRouter);
 
 const PORT = process.env.PORT || 3000;
 
