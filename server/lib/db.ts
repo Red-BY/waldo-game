@@ -22,3 +22,19 @@ export async function getCharactersForBoard(boardName: string) {
 		orderBy: { characterName: "asc" },
 	});
 }
+
+export async function getCharacterLocation(boardName: string, characterName: string) {
+	return prisma.characterLocation.findFirst({
+		where: {
+			characterName,
+			board: { name: boardName },
+		},
+		select: {
+			characterName: true,
+			x1: true,
+			y1: true,
+			x2: true,
+			y2: true,
+		},
+	});
+}
