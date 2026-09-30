@@ -1,31 +1,13 @@
-import { getCharacterLocation } from "../lib/db.js";
+import type { Request, Response } from "express";
+import { getCharacterNamesForBoard } from "../lib/db.js";
 
-function isPointInRectangle(
-	x: number,
-	y: number,
-	x1: number,
-	y1: number,
-	x2: number,
-	y2: number,
-): boolean {
-	const minX = Math.min(x1, x2);
-	const maxX = Math.max(x1, x2);
-	const minY = Math.min(y1, y2);
-	const maxY = Math.max(y1, y2);
+export async function getGameDisplay(req: Request, res: Response) {
+	const boardNumber = Number(req.params.boardNumber);
 
-	return x >= minX && x <= maxX && y >= minY && y <= maxY;
-}
-
-export async function checkCharacterAtCoordinates(
-	boardName: string,
-	characterName: string,
-	x: number,
-	y: number,
-): Promise<boolean> {
-	const location = await getCharacterLocation(boardName, characterName);
-	if (!location) {
-		return false;
+	if (!Number.isInteger(boardNumber) || boardNumber < 1) {
+		return res.status(400).json({ error: "Invalid board number" });
 	}
 
-	return isPointInRectangle(x, y, location.x1, location.y1, location.x2, location.y2);
+	const characterNames = await getCharacterNamesForBoard(boardNumber);
+	return res.json(characterNames);
 }

@@ -23,6 +23,17 @@ export async function getCharactersForBoard(boardName: string) {
 	});
 }
 
+export async function getCharacterNamesForBoard(boardId: number) {
+	const characters = await prisma.characterLocation.findMany({
+		where: { boardId },
+		select: { characterName: true },
+		orderBy: { characterName: "asc" },
+		take: 3,
+	});
+
+	return characters.map((character) => character.characterName);
+}
+
 export async function getCharacterLocation(boardName: string, characterName: string) {
 	return prisma.characterLocation.findFirst({
 		where: {
