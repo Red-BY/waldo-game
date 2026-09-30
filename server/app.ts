@@ -17,6 +17,7 @@ app.use(session({ secret: "cats", resave: false, saveUninitialized: false }));
 app.use(passport.session());
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
+app.use("/images", express.static(path.join(import.meta.dirname, "images")));
 
 app.use("/boards", boardsRouter);
 app.use("/game", gameRouter);

@@ -23,6 +23,13 @@ export async function getCharactersForBoard(boardName: string) {
 	});
 }
 
+export async function getBoardById(boardId: number) {
+	return prisma.board.findUnique({
+		where: { id: boardId },
+		select: { id: true, name: true, image: true },
+	});
+}
+
 export async function getCharacterNamesForBoard(boardId: number) {
 	const characters = await prisma.characterLocation.findMany({
 		where: { boardId },
