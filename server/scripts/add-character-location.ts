@@ -6,7 +6,9 @@ const USAGE = `Usage:
   pnpm add-character-location <boardName> <characterName> <x1> <y1> <x2> <y2>
 
 Example:
-  pnpm add-character-location Game1 Waldo 120.5 340 145 380`;
+  pnpm add-character-location Game1 Waldo 120.5 340 145 380
+
+The board must already exist (create one with pnpm add-board).`;
 
 function parseArgs(argv: string[]) {
 	if (argv.length !== 6) {
@@ -33,7 +35,7 @@ function parseArgs(argv: string[]) {
 }
 
 async function main() {
-	const data = parseArgs(process.argv.slice(2));
+	const { boardName, characterName, x1, y1, x2, y2 } = parseArgs(process.argv.slice(2));
 
 	const connectionString = process.env.DATABASE_URL;
 	if (!connectionString) {
@@ -44,7 +46,21 @@ async function main() {
 	const prisma = new PrismaClient({ adapter });
 
 	try {
-		const entry = await prisma.characterLocation.create({ data });
+		const board = await prisma.board.findUnique({ where: { name: boardName } });
+		if (!board) {
+			throw new Error(`Board "${boardName}" not found. Create it first with: pnpm add-board ${boardName}`);
+		}
+
+		const entry = await prisma.characterLocation.create({
+			data: {
+				boardId: board.id,
+				characterName,
+				x1,
+				y1,
+				x2,
+				y2,
+			},
+		});
 		console.log("Created CharacterLocation:");
 		console.log(entry);
 	} finally {
