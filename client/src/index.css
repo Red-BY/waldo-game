@@ -161,6 +161,45 @@
   }
 }
 
+@keyframes result-ring {
+  0% {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+  55% {
+    opacity: 1;
+    transform: scale(1.14);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes result-pop {
+  0% {
+    opacity: 0;
+    transform: scale(0.2) rotate(-12deg);
+  }
+  65% {
+    opacity: 1;
+    transform: scale(1.08) rotate(4deg);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+  }
+}
+
+@keyframes result-stroke-draw {
+  from {
+    stroke-dashoffset: 100;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
 .animate-fade-up {
   animation: fade-up 0.7s ease-out both;
 }
@@ -191,4 +230,18 @@
 
 .animate-marker-out {
   animation: marker-out 0.2s ease-in both;
+}
+
+.animate-result-ring {
+  animation: result-ring 0.38s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.animate-result-pop {
+  animation: result-pop 0.42s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.animate-result-stroke-draw {
+  stroke-dasharray: 100;
+  stroke-dashoffset: 100;
+  animation: result-stroke-draw 0.38s cubic-bezier(0.22, 1, 0.36, 1) 0.1s forwards;
 }
