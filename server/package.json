@@ -4,6 +4,7 @@
 		"start": "tsx app.ts",
 		"add-board": "tsx scripts/add-board.ts",
 		"add-character-location": "tsx scripts/add-character-location.ts",
+		"clear-db": "tsx scripts/clear-db.ts",
 		"migrate": "bash scripts/migrate.sh"
 	},
 	"devDependencies": {
