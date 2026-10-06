@@ -68,7 +68,7 @@ export function BoardPage() {
       }
 
       try {
-        const response = await fetch(`/game/${boardId}`)
+        const response = await fetch(`/api/game/${boardId}`)
         if (!response.ok) {
           throw new Error('Failed to load board')
         }
@@ -220,7 +220,7 @@ export function BoardPage() {
     )
 
     try {
-      const response = await fetch(`/game/${boardId}/check`, {
+      const response = await fetch(`/api/game/${boardId}/check`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

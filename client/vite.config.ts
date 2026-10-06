@@ -21,9 +21,8 @@ export default defineConfig({
   },
   server: {
     proxy: {
-      '/boards': 'http://localhost:3000',
-      '/game': 'http://localhost:3000',
-      '/images': 'http://localhost:3000',
+      '/api': 'http://localhost:8080',
+      '/images': 'http://localhost:8080',
     },
   },
 })

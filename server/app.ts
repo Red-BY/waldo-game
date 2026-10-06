@@ -19,10 +19,10 @@ app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 app.use("/images", express.static(path.join(import.meta.dirname, "images")));
 
-app.use("/boards", boardsRouter);
-app.use("/game", gameRouter);
+app.use("/api/boards", boardsRouter);
+app.use("/api/game", gameRouter);
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 8080;
 
 app.listen(PORT, (error?: Error) => {
     if (error) {

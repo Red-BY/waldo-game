@@ -17,7 +17,7 @@ export function BoardsPage() {
 
     async function loadBoards() {
       try {
-        const response = await fetch('/boards')
+        const response = await fetch('/api/boards')
         if (!response.ok) {
           throw new Error('Failed to load boards')
         }
