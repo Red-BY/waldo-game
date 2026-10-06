@@ -1,8 +1,8 @@
 import { Router } from "express";
-import { getBoardNames } from "../controllers/boardsController.js";
+import { getBoards } from "../controllers/boardsController.js";
 
 const boardsRouter: Router = Router();
 
-boardsRouter.get("/", getBoardNames);
+boardsRouter.get("/", getBoards);
 
 export default boardsRouter;

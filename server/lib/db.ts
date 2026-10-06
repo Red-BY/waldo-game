@@ -1,12 +1,10 @@
 import { prisma } from "./prisma";
 
-export async function getAllBoardNames() {
-	const boards = await prisma.board.findMany({
-		select: { name: true },
+export async function getAllBoards() {
+	return prisma.board.findMany({
+		select: { id: true, name: true },
 		orderBy: { name: "asc" },
 	});
-
-	return boards.map((board) => board.name);
 }
 
 export async function getCharactersForBoard(boardName: string) {

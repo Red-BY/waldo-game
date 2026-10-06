@@ -19,4 +19,11 @@ export default defineConfig({
       '@': path.resolve(rootDir, './src'),
     },
   },
+  server: {
+    proxy: {
+      '/boards': 'http://localhost:3000',
+      '/game': 'http://localhost:3000',
+      '/images': 'http://localhost:3000',
+    },
+  },
 })
