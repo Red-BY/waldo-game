@@ -1,5 +1,9 @@
 import { getCharacterLocation } from "./db.js";
 
+export function getCharacterImage(characterName: string): string {
+	return `/images/characters/${characterName}.png`;
+}
+
 function isPointInRectangle(
 	x: number,
 	y: number,

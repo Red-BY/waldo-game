@@ -7,6 +7,10 @@ type BoardGame = {
   image: string
 }
 
+function characterImageSrc(name: string) {
+  return `/images/characters/${name}.png`
+}
+
 export function BoardPage() {
   const { boardId } = useParams<{ boardId: string }>()
   const [game, setGame] = useState<BoardGame | null>(null)
@@ -51,37 +55,59 @@ export function BoardPage() {
   }, [boardId])
 
   return (
-    <main className="relative flex min-h-svh flex-col overflow-hidden px-6 py-12">
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0"
-        style={{
-          background:
-            'radial-gradient(ellipse 80% 50% at 50% 0%, oklch(0.95 0.04 230 / 0.95), oklch(0.93 0.03 225 / 0.98) 70%)',
-        }}
-      />
-
-      <div className="relative z-10 mx-auto flex w-full max-w-4xl flex-col gap-6">
-        <Button asChild variant="ghost" size="sm" className="w-fit px-0 text-[#3D5270]">
+    <main className="relative h-svh w-full overflow-hidden bg-[#1a2332]">
+      <header className="absolute inset-x-0 top-0 z-20 flex items-center justify-between gap-4 px-4 py-3 sm:px-6">
+        <Button
+          asChild
+          variant="ghost"
+          size="sm"
+          className="shrink-0 bg-black/40 px-3 text-white backdrop-blur-sm hover:bg-black/55 hover:text-white"
+        >
           <Link to="/boards">← Boards</Link>
         </Button>
 
-        {loading && <p className="text-[#3D5270]">Loading board…</p>}
-        {error && <p className="text-destructive">{error}</p>}
-
         {game && (
-          <>
-            <p className="text-base text-[#3D5270]">
-              Find: {game.characters.join(', ')}
-            </p>
-            <img
-              src={game.image}
-              alt="Game board"
-              className="w-full rounded-lg shadow-md"
-            />
-          </>
+          <ul className="flex items-center gap-3 sm:gap-4">
+            {game.characters.map((name) => (
+              <li key={name} className="flex flex-col items-center gap-1">
+                <img
+                  src={characterImageSrc(name)}
+                  alt={name}
+                  title={name}
+                  className="h-16 w-16 rounded-full border-2 border-white/80 bg-white/90 object-contain p-0.5 shadow-md sm:h-20 sm:w-20"
+                />
+                <span className="rounded bg-black/45 px-1.5 py-0.5 text-[10px] font-medium tracking-wide text-white backdrop-blur-sm sm:text-xs">
+                  {name}
+                </span>
+              </li>
+            ))}
+          </ul>
         )}
-      </div>
+
+        <div className="w-[5.5rem] shrink-0 sm:w-[6.5rem]" aria-hidden="true" />
+      </header>
+
+      {loading && (
+        <p className="absolute inset-0 z-10 flex items-center justify-center text-white/80">
+          Loading board…
+        </p>
+      )}
+      {error && (
+        <p className="absolute inset-0 z-10 flex items-center justify-center text-red-300">
+          {error}
+        </p>
+      )}
+
+      {game && (
+        <div className="h-full w-full overflow-auto">
+          <img
+            src={game.image}
+            alt="Game board"
+            className="block h-auto w-full"
+            draggable={false}
+          />
+        </div>
+      )}
     </main>
   )
 }
