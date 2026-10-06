@@ -104,6 +104,63 @@
   }
 }
 
+@keyframes target-pop {
+  0% {
+    opacity: 0;
+    transform: scale(0.35);
+  }
+  70% {
+    opacity: 1;
+    transform: scale(1.12);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes target-pulse {
+  0% {
+    opacity: 0.7;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.85);
+  }
+}
+
+@keyframes menu-in {
+  from {
+    opacity: 0;
+    transform: translateY(-0.4rem) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes menu-out {
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-0.35rem) scale(0.96);
+  }
+}
+
+@keyframes marker-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
 .animate-fade-up {
   animation: fade-up 0.7s ease-out both;
 }
@@ -114,4 +171,24 @@
 
 .animate-stripe-drift {
   animation: stripe-drift 18s linear infinite;
+}
+
+.animate-target-pop {
+  animation: target-pop 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.animate-target-pulse {
+  animation: target-pulse 0.9s ease-out 0.15s both;
+}
+
+.animate-menu-in {
+  animation: menu-in 0.22s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.animate-menu-out {
+  animation: menu-out 0.18s ease-in both;
+}
+
+.animate-marker-out {
+  animation: marker-out 0.2s ease-in both;
 }
