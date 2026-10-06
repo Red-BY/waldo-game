@@ -55,19 +55,19 @@ export function BoardPage() {
   }, [boardId])
 
   return (
-    <main className="relative h-svh w-full overflow-hidden bg-[#1a2332]">
-      <header className="absolute inset-x-0 top-0 z-20 flex items-center justify-between gap-4 px-4 py-3 sm:px-6">
+    <main className="relative h-svh w-full cursor-crosshair overflow-hidden bg-[#1a2332]">
+      <header className="pointer-events-none absolute inset-x-0 top-0 z-20 flex items-center justify-between gap-4 px-4 py-3 sm:px-6">
         <Button
           asChild
           variant="ghost"
           size="sm"
-          className="shrink-0 bg-black/40 px-3 text-white backdrop-blur-sm hover:bg-black/55 hover:text-white"
+          className="pointer-events-auto shrink-0 cursor-pointer bg-black/40 px-3 text-white backdrop-blur-sm hover:bg-black/55 hover:text-white"
         >
           <Link to="/boards">← Boards</Link>
         </Button>
 
         {game && (
-          <ul className="flex items-center gap-3 sm:gap-4">
+          <ul className="pointer-events-auto flex cursor-default items-center gap-3 sm:gap-4">
             {game.characters.map((name) => (
               <li key={name} className="flex flex-col items-center gap-1">
                 <img
@@ -88,12 +88,12 @@ export function BoardPage() {
       </header>
 
       {loading && (
-        <p className="absolute inset-0 z-10 flex items-center justify-center text-white/80">
+        <p className="absolute inset-0 z-10 flex cursor-default items-center justify-center text-white/80">
           Loading board…
         </p>
       )}
       {error && (
-        <p className="absolute inset-0 z-10 flex items-center justify-center text-red-300">
+        <p className="absolute inset-0 z-10 flex cursor-default items-center justify-center text-red-300">
           {error}
         </p>
       )}
