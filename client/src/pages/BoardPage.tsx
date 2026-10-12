@@ -35,6 +35,13 @@ function characterImageSrc(name: string) {
   return `/images/characters/${name}.png`
 }
 
+function formatElapsed(ms: number) {
+  const totalSeconds = Math.floor(ms / 1000)
+  const minutes = Math.floor(totalSeconds / 60)
+  const seconds = totalSeconds % 60
+  return `${minutes}:${seconds.toString().padStart(2, '0')}`
+}
+
 function distanceToRect(clientX: number, clientY: number, rect: DOMRect) {
   const dx = Math.max(rect.left - clientX, 0, clientX - rect.right)
   const dy = Math.max(rect.top - clientY, 0, clientY - rect.bottom)
@@ -48,9 +55,12 @@ export function BoardPage() {
   const [loading, setLoading] = useState(true)
   const [marker, setMarker] = useState<MarkerState | null>(null)
   const [foundCharacters, setFoundCharacters] = useState<Set<string>>(() => new Set())
+  const [elapsedMs, setElapsedMs] = useState(0)
+  const [timerRunning, setTimerRunning] = useState(false)
   const imageContainerRef = useRef<HTMLDivElement>(null)
   const markerRef = useRef<HTMLDivElement>(null)
   const markerIdRef = useRef(0)
+  const clientStartedAtRef = useRef<number | null>(null)
 
   const menuOpen =
     marker !== null && !marker.closing && marker.menuVisible && marker.outcome === null
@@ -67,8 +77,14 @@ export function BoardPage() {
         return
       }
 
+      setTimerRunning(false)
+      clientStartedAtRef.current = null
+      setElapsedMs(0)
+
       try {
-        const response = await fetch(`/api/game/${boardId}`)
+        const response = await fetch(`/api/game/${boardId}`, {
+          credentials: 'include',
+        })
         if (!response.ok) {
           throw new Error('Failed to load board')
         }
@@ -78,6 +94,9 @@ export function BoardPage() {
           setFoundCharacters(new Set())
           setMarker(null)
           setError(null)
+          clientStartedAtRef.current = Date.now()
+          setElapsedMs(0)
+          setTimerRunning(true)
         }
       } catch {
         if (!cancelled) {
@@ -95,6 +114,23 @@ export function BoardPage() {
       cancelled = true
     }
   }, [boardId])
+
+  useEffect(() => {
+    if (!timerRunning || clientStartedAtRef.current === null) return
+
+    const intervalId = window.setInterval(() => {
+      const startedAt = clientStartedAtRef.current
+      if (startedAt === null) return
+      setElapsedMs(Date.now() - startedAt)
+    }, 100)
+
+    return () => window.clearInterval(intervalId)
+  }, [timerRunning])
+
+  useEffect(() => {
+    if (!game || remainingCharacters.length > 0 || !timerRunning) return
+    setTimerRunning(false)
+  }, [game, remainingCharacters.length, timerRunning])
 
   useEffect(() => {
     if (!menuOpen) return
@@ -222,6 +258,7 @@ export function BoardPage() {
     try {
       const response = await fetch(`/api/game/${boardId}/check`, {
         method: 'POST',
+        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           characterName,
@@ -294,7 +331,19 @@ export function BoardPage() {
           </ul>
         )}
 
-        <div className="w-[5.5rem] shrink-0 sm:w-[6.5rem]" aria-hidden="true" />
+        <div
+          className="pointer-events-none flex w-[5.5rem] shrink-0 justify-end sm:w-[6.5rem]"
+          aria-live="polite"
+        >
+          {game && (
+            <time
+              dateTime={`PT${Math.floor(elapsedMs / 1000)}S`}
+              className="rounded bg-black/45 px-2.5 py-1 font-mono text-sm font-medium tabular-nums tracking-wide text-white backdrop-blur-sm sm:text-base"
+            >
+              {formatElapsed(elapsedMs)}
+            </time>
+          )}
+        </div>
       </header>
 
       {loading && (

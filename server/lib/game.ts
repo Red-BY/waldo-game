@@ -1,7 +1,24 @@
+import type { Request } from "express";
 import { getCharacterLocation } from "./db.js";
+
+type GameSession = Request["session"];
 
 export function getCharacterImage(characterName: string): string {
 	return `/images/characters/${characterName}.png`;
+}
+
+export function startServerTimer(session: GameSession, boardId: number): number {
+	const startedAt = Date.now();
+	session.gameStartedAt = startedAt;
+	session.gameBoardId = boardId;
+	return startedAt;
+}
+
+export function getServerElapsedMs(session: GameSession, boardId: number): number | null {
+	if (session.gameBoardId !== boardId || session.gameStartedAt === undefined) {
+		return null;
+	}
+	return Date.now() - session.gameStartedAt;
 }
 
 function isPointInRectangle(

@@ -2,7 +2,7 @@ import type { Request, Response } from "express";
 import fs from "node:fs/promises";
 import path from "node:path";
 import { getBoardById, getCharacterNamesForBoard } from "../lib/db.js";
-import { checkCharacterAtCoordinates } from "../lib/game.js";
+import { checkCharacterAtCoordinates, startServerTimer } from "../lib/game.js";
 
 export async function getGameDisplay(req: Request, res: Response) {
 	const boardNumber = Number(req.params.boardNumber);
@@ -24,6 +24,8 @@ export async function getGameDisplay(req: Request, res: Response) {
 	}
 
 	const characterNames = await getCharacterNamesForBoard(boardNumber);
+	startServerTimer(req.session, boardNumber);
+
 	return res.json({
 		characters: characterNames,
 		image: `/images/${board.image}`,
