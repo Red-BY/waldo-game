@@ -11,6 +11,7 @@ export function startServerTimer(session: GameSession, boardId: number): number 
 	const startedAt = Date.now();
 	session.gameStartedAt = startedAt;
 	session.gameBoardId = boardId;
+	delete session.gameCompletedMs;
 	return startedAt;
 }
 
@@ -18,7 +19,22 @@ export function getServerElapsedMs(session: GameSession, boardId: number): numbe
 	if (session.gameBoardId !== boardId || session.gameStartedAt === undefined) {
 		return null;
 	}
+	if (session.gameCompletedMs !== undefined) {
+		return session.gameCompletedMs;
+	}
 	return Date.now() - session.gameStartedAt;
+}
+
+export function completeServerTimer(session: GameSession, boardId: number): number | null {
+	if (session.gameBoardId !== boardId || session.gameStartedAt === undefined) {
+		return null;
+	}
+	if (session.gameCompletedMs !== undefined) {
+		return session.gameCompletedMs;
+	}
+	const elapsedMs = Date.now() - session.gameStartedAt;
+	session.gameCompletedMs = elapsedMs;
+	return elapsedMs;
 }
 
 function isPointInRectangle(

@@ -1,4 +1,4 @@
-import { Link, useParams } from 'react-router-dom'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import { useEffect, useRef, useState, type AnimationEvent, type MouseEvent } from 'react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
@@ -50,6 +50,7 @@ function distanceToRect(clientX: number, clientY: number, rect: DOMRect) {
 
 export function BoardPage() {
   const { boardId } = useParams<{ boardId: string }>()
+  const navigate = useNavigate()
   const [game, setGame] = useState<BoardGame | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
@@ -61,6 +62,7 @@ export function BoardPage() {
   const markerRef = useRef<HTMLDivElement>(null)
   const markerIdRef = useRef(0)
   const clientStartedAtRef = useRef<number | null>(null)
+  const victoryNavigatedRef = useRef(false)
 
   const menuOpen =
     marker !== null && !marker.closing && marker.menuVisible && marker.outcome === null
@@ -79,6 +81,7 @@ export function BoardPage() {
 
       setTimerRunning(false)
       clientStartedAtRef.current = null
+      victoryNavigatedRef.current = false
       setElapsedMs(0)
 
       try {
@@ -128,9 +131,24 @@ export function BoardPage() {
   }, [timerRunning])
 
   useEffect(() => {
-    if (!game || remainingCharacters.length > 0 || !timerRunning) return
+    if (!game || !boardId || remainingCharacters.length > 0 || victoryNavigatedRef.current) {
+      return
+    }
+
     setTimerRunning(false)
-  }, [game, remainingCharacters.length, timerRunning])
+    victoryNavigatedRef.current = true
+
+    void fetch(`/api/game/${boardId}/complete`, {
+      method: 'POST',
+      credentials: 'include',
+    })
+
+    const timeoutId = window.setTimeout(() => {
+      void navigate(`/boards/${boardId}/victory`)
+    }, 900)
+
+    return () => window.clearTimeout(timeoutId)
+  }, [game, boardId, remainingCharacters.length, navigate])
 
   useEffect(() => {
     if (!menuOpen) return

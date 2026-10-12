@@ -2,7 +2,11 @@ import type { Request, Response } from "express";
 import fs from "node:fs/promises";
 import path from "node:path";
 import { getBoardById, getCharacterNamesForBoard } from "../lib/db.js";
-import { checkCharacterAtCoordinates, startServerTimer } from "../lib/game.js";
+import {
+	checkCharacterAtCoordinates,
+	completeServerTimer,
+	startServerTimer,
+} from "../lib/game.js";
 
 export async function getGameDisplay(req: Request, res: Response) {
 	const boardNumber = Number(req.params.boardNumber);
@@ -55,4 +59,24 @@ export async function checkCharacter(req: Request, res: Response) {
 
 	const found = await checkCharacterAtCoordinates(board.name, characterName, x, y);
 	return res.json({ found });
+}
+
+export async function completeGame(req: Request, res: Response) {
+	const boardNumber = Number(req.params.boardNumber);
+
+	if (!Number.isInteger(boardNumber) || boardNumber < 1) {
+		return res.status(400).json({ error: "Invalid board number" });
+	}
+
+	const board = await getBoardById(boardNumber);
+	if (!board) {
+		return res.status(404).json({ error: "Board not found" });
+	}
+
+	const elapsedMs = completeServerTimer(req.session, boardNumber);
+	if (elapsedMs === null) {
+		return res.status(400).json({ error: "No active game for this board" });
+	}
+
+	return res.json({ elapsedMs });
 }
