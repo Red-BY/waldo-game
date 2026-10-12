@@ -45,7 +45,7 @@ export function HomePage() {
             size="lg"
             className="h-12 w-56 px-8 text-base font-semibold shadow-md transition-transform hover:scale-[1.03] active:scale-[0.98]"
           >
-            <Link to="/boards">Play</Link>
+            <Link to="/boards/2">Play</Link>
           </Button>
           <Button
             asChild

@@ -315,7 +315,7 @@ export function BoardPage() {
           size="sm"
           className="pointer-events-auto shrink-0 cursor-pointer bg-black/40 px-3 text-white backdrop-blur-sm hover:bg-black/55 hover:text-white"
         >
-          <Link to="/boards">← Boards</Link>
+          <Link to="/">← Home</Link>
         </Button>
 
         {game && (
