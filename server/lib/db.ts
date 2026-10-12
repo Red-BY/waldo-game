@@ -65,6 +65,6 @@ export async function createScore(playerName: string, score: number) {
 export async function getAllScores() {
 	return prisma.score.findMany({
 		select: { id: true, playerName: true, score: true },
-		orderBy: { score: "desc" },
+		orderBy: { score: "asc" },
 	});
 }

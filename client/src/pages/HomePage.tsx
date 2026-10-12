@@ -36,13 +36,24 @@ export function HomePage() {
           Scan the crowd and find given characters as fast as possible.
         </p>
 
-        <div className="animate-fade-up mt-8" style={{ animationDelay: '360ms' }}>
+        <div
+          className="animate-fade-up mt-8 flex flex-col items-center gap-3"
+          style={{ animationDelay: '360ms' }}
+        >
           <Button
             asChild
             size="lg"
-            className="h-12 min-w-40 px-8 text-base font-semibold shadow-md transition-transform hover:scale-[1.03] active:scale-[0.98]"
+            className="h-12 w-56 px-8 text-base font-semibold shadow-md transition-transform hover:scale-[1.03] active:scale-[0.98]"
           >
             <Link to="/boards">Play</Link>
+          </Button>
+          <Button
+            asChild
+            size="lg"
+            variant="outline"
+            className="h-12 w-56 bg-white/60 px-8 text-base font-semibold shadow-md transition-transform hover:scale-[1.03] active:scale-[0.98]"
+          >
+            <Link to="/leaderboard">Leaderboard</Link>
           </Button>
         </div>
       </div>
