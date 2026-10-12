@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, type FormEvent } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 
@@ -14,6 +14,10 @@ export function VictoryPage() {
   const [elapsedMs, setElapsedMs] = useState<number | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
+  const [playerName, setPlayerName] = useState('')
+  const [submitting, setSubmitting] = useState(false)
+  const [submitError, setSubmitError] = useState<string | null>(null)
+  const [submitted, setSubmitted] = useState(false)
 
   useEffect(() => {
     let cancelled = false
@@ -55,6 +59,36 @@ export function VictoryPage() {
     }
   }, [boardId])
 
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+    if (elapsedMs === null || submitting || submitted) return
+
+    const name = playerName.trim()
+    if (!name) {
+      setSubmitError('Please enter a player name.')
+      return
+    }
+
+    setSubmitting(true)
+    setSubmitError(null)
+
+    try {
+      const response = await fetch('/api/scores', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, score: elapsedMs }),
+      })
+      if (!response.ok) {
+        throw new Error('Failed to record score')
+      }
+      setSubmitted(true)
+    } catch {
+      setSubmitError('Could not record your result. Try again.')
+    } finally {
+      setSubmitting(false)
+    }
+  }
+
   return (
     <main className="relative flex min-h-svh flex-col items-center justify-center overflow-hidden px-6 py-16">
       <div
@@ -82,13 +116,6 @@ export function VictoryPage() {
           Congratulations!
         </h1>
 
-        <p
-          className="animate-fade-up mt-3 text-base text-[#3D5270] sm:text-lg"
-          style={{ animationDelay: '120ms' }}
-        >
-          You found everyone.
-        </p>
-
         {loading && (
           <p
             className="animate-fade-up mt-8 text-[#3D5270]"
@@ -108,25 +135,71 @@ export function VictoryPage() {
         )}
 
         {!loading && !error && elapsedMs !== null && (
-          <p
-            className="animate-fade-up mt-8 font-mono text-3xl font-medium tabular-nums tracking-wide text-[#1E3A5F] sm:text-4xl"
+          <div
+            className="animate-fade-up mt-8 flex flex-col items-center"
             style={{ animationDelay: '200ms' }}
-            aria-live="polite"
           >
-            <span className="sr-only">Completion time: </span>
-            <time dateTime={`PT${Math.floor(elapsedMs / 1000)}S`}>
-              {formatElapsed(elapsedMs)}
-            </time>
-          </p>
+            <p className="text-base text-[#3D5270] sm:text-lg">
+              Your completion time:
+            </p>
+            <p
+              className="mt-2 font-mono text-3xl font-medium tabular-nums tracking-wide text-[#1E3A5F] sm:text-4xl"
+              aria-live="polite"
+            >
+              <time dateTime={`PT${Math.floor(elapsedMs / 1000)}S`}>
+                {formatElapsed(elapsedMs)}
+              </time>
+            </p>
+
+            {!submitted ? (
+              <form
+                onSubmit={handleSubmit}
+                className="mt-8 flex w-full max-w-xs flex-col items-center gap-3"
+              >
+                <p className="text-base text-[#3D5270] sm:text-lg">
+                  Record your result?
+                </p>
+                <input
+                  type="text"
+                  name="playerName"
+                  autoComplete="nickname"
+                  placeholder="Player Name"
+                  aria-label="Player Name"
+                  value={playerName}
+                  onChange={(event) => setPlayerName(event.target.value)}
+                  disabled={submitting}
+                  className="h-10 w-full rounded-lg border border-input bg-white/80 px-3 text-base text-[#1E3A5F] outline-none placeholder:text-[#3D5270]/70 focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:opacity-50"
+                />
+                {submitError && (
+                  <p className="text-sm text-destructive" role="alert">
+                    {submitError}
+                  </p>
+                )}
+                <Button
+                  type="submit"
+                  size="lg"
+                  disabled={submitting}
+                  className="h-12 w-56 px-8 text-base font-semibold shadow-md transition-transform hover:scale-[1.03] active:scale-[0.98]"
+                >
+                  {submitting ? 'Submitting…' : 'Submit'}
+                </Button>
+              </form>
+            ) : (
+              <p className="mt-8 text-base text-[#3D5270]" role="status">
+                Result recorded. You can find your score on the leaderboard!
+              </p>
+            )}
+          </div>
         )}
 
         <div className="animate-fade-up mt-10" style={{ animationDelay: '360ms' }}>
           <Button
             asChild
             size="lg"
-            className="h-12 min-w-40 px-8 text-base font-semibold shadow-md transition-transform hover:scale-[1.03] active:scale-[0.98]"
+            variant="outline"
+            className="h-12 w-56 bg-white/60 px-8 text-base font-semibold shadow-md transition-transform hover:scale-[1.03] active:scale-[0.98]"
           >
-            <Link to="/boards">Play again</Link>
+            <Link to="/">Return to main menu</Link>
           </Button>
         </div>
       </div>
