@@ -58,6 +58,7 @@ export function BoardPage() {
   const [foundCharacters, setFoundCharacters] = useState<Set<string>>(() => new Set())
   const [elapsedMs, setElapsedMs] = useState(0)
   const [timerRunning, setTimerRunning] = useState(false)
+  const [introVisible, setIntroVisible] = useState(true)
   const imageContainerRef = useRef<HTMLDivElement>(null)
   const markerRef = useRef<HTMLDivElement>(null)
   const markerIdRef = useRef(0)
@@ -75,6 +76,7 @@ export function BoardPage() {
     async function loadBoard() {
       if (!boardId) {
         setError('Invalid board')
+        setIntroVisible(false)
         setLoading(false)
         return
       }
@@ -82,6 +84,7 @@ export function BoardPage() {
       setTimerRunning(false)
       clientStartedAtRef.current = null
       victoryNavigatedRef.current = false
+      setIntroVisible(true)
       setElapsedMs(0)
 
       try {
@@ -104,6 +107,7 @@ export function BoardPage() {
       } catch {
         if (!cancelled) {
           setError('Could not load this board.')
+          setIntroVisible(false)
         }
       } finally {
         if (!cancelled) {
@@ -306,8 +310,24 @@ export function BoardPage() {
     setMarker((current) => (current?.closing ? null : current))
   }
 
+  function handleIntroAnimationEnd(event: AnimationEvent<HTMLDivElement>) {
+    if (event.animationName !== 'board-intro-fade') return
+    setIntroVisible(false)
+  }
+
   return (
     <main className="relative h-svh w-full cursor-crosshair overflow-hidden bg-[#1a2332]">
+      {introVisible && (
+        <div
+          className={cn(
+            'pointer-events-none absolute inset-0 z-50 bg-[#1a2332]',
+            game && 'animate-board-intro-fade',
+          )}
+          onAnimationEnd={handleIntroAnimationEnd}
+          aria-hidden="true"
+        />
+      )}
+
       <header className="pointer-events-none absolute inset-x-0 top-0 z-20 flex items-center justify-between gap-4 px-4 py-3 sm:px-6">
         <Button
           asChild
