@@ -31,7 +31,8 @@ export function LeaderboardPage() {
         }
         const data: unknown = await response.json()
         if (!cancelled) {
-          setScores(Array.isArray(data) ? (data as ScoreEntry[]) : [])
+          const entries = Array.isArray(data) ? (data as ScoreEntry[]) : []
+          setScores([...entries].sort((a, b) => a.score - b.score))
           setError(null)
         }
       } catch {
