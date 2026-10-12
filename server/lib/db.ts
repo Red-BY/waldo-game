@@ -54,3 +54,17 @@ export async function getCharacterLocation(boardName: string, characterName: str
 		},
 	});
 }
+
+export async function createScore(playerName: string, score: number) {
+	return prisma.score.create({
+		data: { playerName, score },
+		select: { id: true, playerName: true, score: true },
+	});
+}
+
+export async function getAllScores() {
+	return prisma.score.findMany({
+		select: { id: true, playerName: true, score: true },
+		orderBy: { score: "desc" },
+	});
+}

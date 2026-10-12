@@ -5,6 +5,7 @@ import session from "express-session";
 import passport from "passport";
 import boardsRouter from "./routes/boardsRouter.js";
 import gameRouter from "./routes/gameRouter.js";
+import scoresRouter from "./routes/scoresRouter.js";
 
 const app = express();
 
@@ -21,6 +22,7 @@ app.use("/images", express.static(path.join(import.meta.dirname, "images")));
 
 app.use("/api/boards", boardsRouter);
 app.use("/api/game", gameRouter);
+app.use("/api/scores", scoresRouter);
 
 const PORT = process.env.PORT || 8080;
 
