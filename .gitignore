@@ -1,0 +1,8 @@
+.neon
+node_modules/
+.env.local
+
+# Local env files (Neon writes production credentials to .env.local)
+.env
+.env.*
+!.env.example
