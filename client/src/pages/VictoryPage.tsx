@@ -1,6 +1,7 @@
 import { useEffect, useState, type FormEvent } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
+import { MAX_PLAYER_NAME_LENGTH } from '@/lib/boards'
 
 function formatElapsed(ms: number) {
   const totalSeconds = Math.floor(ms / 1000)
@@ -76,8 +77,20 @@ export function VictoryPage() {
       const response = await fetch('/api/scores', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, score: elapsedMs }),
+        credentials: 'include',
+        body: JSON.stringify({ name }),
       })
+      if (response.status === 400) {
+        // The server explains rejected names (length, profanity); let the player pick another.
+        const data = (await response.json().catch(() => null)) as { error?: string } | null
+        setSubmitError(data?.error ?? 'Please choose a different name.')
+        return
+      }
+      if (response.status === 409) {
+        setSubmitError('This result has already been recorded.')
+        setSubmitted(true)
+        return
+      }
       if (!response.ok) {
         throw new Error('Failed to record score')
       }
@@ -165,6 +178,7 @@ export function VictoryPage() {
                   autoComplete="nickname"
                   placeholder="Player Name"
                   aria-label="Player Name"
+                  maxLength={MAX_PLAYER_NAME_LENGTH}
                   value={playerName}
                   onChange={(event) => setPlayerName(event.target.value)}
                   disabled={submitting}

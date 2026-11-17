@@ -5,5 +5,6 @@ declare module "express-session" {
 		gameStartedAt?: number;
 		gameBoardId?: number;
 		gameCompletedMs?: number;
+		scoreClaimed?: boolean;
 	}
 }

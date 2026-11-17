@@ -1,21 +1,22 @@
-import type { Request } from "express";
+import type { SessionData } from "express-session";
 import { getCharacterLocation } from "./db.js";
 
-type GameSession = Request["session"];
+export type GameState = Pick<SessionData, "gameStartedAt" | "gameBoardId" | "gameCompletedMs" | "scoreClaimed">;
 
 export function getCharacterImage(characterName: string): string {
 	return `/images/characters/${characterName}.png`;
 }
 
-export function startServerTimer(session: GameSession, boardId: number): number {
+export function startServerTimer(session: GameState, boardId: number): number {
 	const startedAt = Date.now();
 	session.gameStartedAt = startedAt;
 	session.gameBoardId = boardId;
 	delete session.gameCompletedMs;
+	delete session.scoreClaimed;
 	return startedAt;
 }
 
-export function getServerElapsedMs(session: GameSession, boardId: number): number | null {
+export function getServerElapsedMs(session: GameState, boardId: number): number | null {
 	if (session.gameBoardId !== boardId || session.gameStartedAt === undefined) {
 		return null;
 	}
@@ -25,7 +26,7 @@ export function getServerElapsedMs(session: GameSession, boardId: number): numbe
 	return Date.now() - session.gameStartedAt;
 }
 
-export function completeServerTimer(session: GameSession, boardId: number): number | null {
+export function completeServerTimer(session: GameState, boardId: number): number | null {
 	if (session.gameBoardId !== boardId || session.gameStartedAt === undefined) {
 		return null;
 	}
@@ -35,6 +36,15 @@ export function completeServerTimer(session: GameSession, boardId: number): numb
 	const elapsedMs = Date.now() - session.gameStartedAt;
 	session.gameCompletedMs = elapsedMs;
 	return elapsedMs;
+}
+
+/** Hands out the Score of a completed Game exactly once. */
+export function claimScore(session: GameState): { boardId: number; elapsedMs: number } | null {
+	if (session.gameBoardId === undefined || session.gameCompletedMs === undefined || session.scoreClaimed) {
+		return null;
+	}
+	session.scoreClaimed = true;
+	return { boardId: session.gameBoardId, elapsedMs: session.gameCompletedMs };
 }
 
 function isPointInRectangle(

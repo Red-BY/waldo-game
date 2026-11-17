@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
+import { DEFAULT_BOARD_ID } from '@/lib/boards'
 
 type ScoreEntry = {
   id: number
@@ -25,7 +26,7 @@ export function LeaderboardPage() {
 
     async function loadScores() {
       try {
-        const response = await fetch('/api/scores')
+        const response = await fetch(`/api/scores?boardId=${DEFAULT_BOARD_ID}`)
         if (!response.ok) {
           throw new Error('Failed to load scores')
         }
