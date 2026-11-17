@@ -3,9 +3,7 @@ import { BoardPage } from '@/pages/BoardPage'
 import { HomePage } from '@/pages/HomePage'
 import { LeaderboardPage } from '@/pages/LeaderboardPage'
 import { VictoryPage } from '@/pages/VictoryPage'
-
-/** Temporary: only Space is playable; board select is hidden. */
-const DEFAULT_BOARD_ID = 2
+import { DEFAULT_BOARD_ID } from '@/lib/boards'
 
 function App() {
   return (

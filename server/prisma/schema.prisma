@@ -17,6 +17,7 @@ model Board {
   name                String              @unique
   image               String
   characterLocations  CharacterLocation[]
+  scores              Score[]
 }
 
 model CharacterLocation {
@@ -32,6 +33,22 @@ model CharacterLocation {
 
 model Score {
   id         Int    @id @default(autoincrement())
+  // The Game this Score came from; unique so a Game can only ever produce one Score.
+  gameId     String @unique
+  boardId    Int
+  board      Board  @relation(fields: [boardId], references: [id], onDelete: Cascade)
   playerName String
   score      Int
+
+  @@index([boardId, score])
+}
+
+// Managed by connect-pg-simple at runtime; declared here so migrations own the table.
+model Session {
+  sid    String   @id @db.VarChar
+  sess   Json     @db.Json
+  expire DateTime @db.Timestamp(6)
+
+  @@index([expire], map: "IDX_session_expire")
+  @@map("session")
 }

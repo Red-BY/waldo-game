@@ -1,6 +1,4 @@
-import "dotenv/config";
-import { PrismaPg } from "@prisma/adapter-pg";
-import { PrismaClient } from "../generated/prisma/client.js";
+import { runScript } from "../lib/runScript.js";
 
 const USAGE = `Usage:
   pnpm add-board <boardName> <image>
@@ -24,27 +22,10 @@ function parseArgs(argv: string[]) {
 	return { name: boardName!, image: image! };
 }
 
-async function main() {
+runScript(async (prisma) => {
 	const data = parseArgs(process.argv.slice(2));
 
-	const connectionString = process.env.DATABASE_URL;
-	if (!connectionString) {
-		throw new Error("DATABASE_URL is not set");
-	}
-
-	const adapter = new PrismaPg({ connectionString });
-	const prisma = new PrismaClient({ adapter });
-
-	try {
-		const board = await prisma.board.create({ data });
-		console.log("Created Board:");
-		console.log(board);
-	} finally {
-		await prisma.$disconnect();
-	}
-}
-
-main().catch((error: unknown) => {
-	console.error(error instanceof Error ? error.message : error);
-	process.exit(1);
+	const board = await prisma.board.create({ data });
+	console.log("Created Board:");
+	console.log(board);
 });

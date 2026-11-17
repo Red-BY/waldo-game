@@ -1,0 +1,31 @@
+# Render Blueprint: one free web service that serves both the API and the built React client.
+# Create it from the Render dashboard: New > Blueprint > pick this repo.
+services:
+  - type: web
+    name: waldo-game
+    runtime: node
+    plan: free
+    region: frankfurt
+    branch: main
+    buildCommand: >-
+      corepack enable &&
+      cd client && pnpm install --frozen-lockfile --prod=false && pnpm build &&
+      cd ../server && pnpm install --frozen-lockfile &&
+      pnpm exec prisma generate &&
+      pnpm exec prisma migrate deploy &&
+      pnpm seed
+    startCommand: cd server && pnpm start
+    healthCheckPath: /api/boards
+    envVars:
+      - key: NODE_VERSION
+        value: "24"
+      - key: NODE_ENV
+        value: production
+      # Neon pooled connection string (host contains "-pooler"); used by the running app.
+      - key: DATABASE_URL
+        sync: false
+      # Neon direct connection string; used by prisma migrate deploy.
+      - key: DIRECT_URL
+        sync: false
+      - key: SESSION_SECRET
+        generateValue: true

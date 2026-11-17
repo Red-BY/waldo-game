@@ -1,6 +1,4 @@
-import "dotenv/config";
-import { PrismaPg } from "@prisma/adapter-pg";
-import { PrismaClient } from "../generated/prisma/client.js";
+import { runScript } from "../lib/runScript.js";
 
 const USAGE = `Usage:
   pnpm add-character-location <boardName> <characterName> <x1> <y1> <x2> <y2>
@@ -34,41 +32,24 @@ function parseArgs(argv: string[]) {
 	};
 }
 
-async function main() {
+runScript(async (prisma) => {
 	const { boardName, characterName, x1, y1, x2, y2 } = parseArgs(process.argv.slice(2));
 
-	const connectionString = process.env.DATABASE_URL;
-	if (!connectionString) {
-		throw new Error("DATABASE_URL is not set");
+	const board = await prisma.board.findUnique({ where: { name: boardName } });
+	if (!board) {
+		throw new Error(`Board "${boardName}" not found. Create it first with: pnpm add-board ${boardName}`);
 	}
 
-	const adapter = new PrismaPg({ connectionString });
-	const prisma = new PrismaClient({ adapter });
-
-	try {
-		const board = await prisma.board.findUnique({ where: { name: boardName } });
-		if (!board) {
-			throw new Error(`Board "${boardName}" not found. Create it first with: pnpm add-board ${boardName}`);
-		}
-
-		const entry = await prisma.characterLocation.create({
-			data: {
-				boardId: board.id,
-				characterName,
-				x1,
-				y1,
-				x2,
-				y2,
-			},
-		});
-		console.log("Created CharacterLocation:");
-		console.log(entry);
-	} finally {
-		await prisma.$disconnect();
-	}
-}
-
-main().catch((error: unknown) => {
-	console.error(error instanceof Error ? error.message : error);
-	process.exit(1);
+	const entry = await prisma.characterLocation.create({
+		data: {
+			boardId: board.id,
+			characterName,
+			x1,
+			y1,
+			x2,
+			y2,
+		},
+	});
+	console.log("Created CharacterLocation:");
+	console.log(entry);
 });
