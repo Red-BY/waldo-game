@@ -1,5 +1,6 @@
 import { englishDataset, englishRecommendedTransformers, RegExpMatcher } from "obscenity";
 
+// The client mirrors this in client/src/lib/playerName.ts for its input limit; keep them in sync.
 export const MAX_PLAYER_NAME_LENGTH = 20;
 
 const profanityMatcher = new RegExpMatcher({

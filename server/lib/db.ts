@@ -1,4 +1,6 @@
-import { prisma } from "./prisma";
+import type { CompletedGame } from "./game.js";
+import { Prisma } from "../generated/prisma/client.js";
+import { prisma } from "./prisma.js";
 
 export async function getAllBoards() {
 	return prisma.board.findMany({
@@ -55,11 +57,19 @@ export async function getCharacterLocation(boardName: string, characterName: str
 	});
 }
 
-export async function createScore(boardId: number, playerName: string, score: number) {
-	return prisma.score.create({
-		data: { boardId, playerName, score },
-		select: { id: true, playerName: true, score: true },
-	});
+/** Records a completed Game as a Score; returns null if that Game already has a Score. */
+export async function createScore({ gameId, boardId, elapsedMs }: CompletedGame, playerName: string) {
+	try {
+		return await prisma.score.create({
+			data: { gameId, boardId, playerName, score: elapsedMs },
+			select: { id: true, playerName: true, score: true },
+		});
+	} catch (error) {
+		if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002") {
+			return null;
+		}
+		throw error;
+	}
 }
 
 export async function getScoresForBoard(boardId: number) {

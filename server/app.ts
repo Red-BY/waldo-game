@@ -1,48 +1,21 @@
+// Locally settings come from .env (if present); on Render they are real environment variables.
+import "dotenv/config";
 import express from "express";
 import fs from "node:fs";
 import path from "node:path";
-import { loadEnvFile } from "node:process";
-import connectPgSimple from "connect-pg-simple";
-import session from "express-session";
-import pg from "pg";
+import { createSessionMiddleware } from "./lib/session.js";
 import boardsRouter from "./routes/boardsRouter.js";
 import gameRouter from "./routes/gameRouter.js";
 import scoresRouter from "./routes/scoresRouter.js";
 
-// Locally settings come from .env; on Render they are real environment variables.
-if (fs.existsSync(path.join(import.meta.dirname, ".env"))) {
-	loadEnvFile(path.join(import.meta.dirname, ".env"));
-}
-
 const isProduction = process.env.NODE_ENV === "production";
-
-const sessionSecret = process.env.SESSION_SECRET;
-if (isProduction && !sessionSecret) {
-	throw new Error("SESSION_SECRET must be set in production");
-}
 
 const app = express();
 
 // Render terminates TLS at its proxy; trust it so secure cookies are issued.
 app.set("trust proxy", 1);
 
-const PgSessionStore = connectPgSimple(session);
-const sessionPool = new pg.Pool({ connectionString: process.env.DATABASE_URL });
-
-app.use(
-	session({
-		store: new PgSessionStore({ pool: sessionPool, tableName: "session" }),
-		secret: sessionSecret ?? "dev-only-session-secret",
-		resave: false,
-		saveUninitialized: false,
-		cookie: {
-			maxAge: 24 * 60 * 60 * 1000,
-			httpOnly: true,
-			sameSite: "lax",
-			secure: isProduction,
-		},
-	}),
-);
+app.use(createSessionMiddleware({ isProduction }));
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 app.use("/images", express.static(path.join(import.meta.dirname, "images")));
@@ -55,7 +28,7 @@ app.use("/api/scores", scoresRouter);
 const clientDist = path.join(import.meta.dirname, "..", "client", "dist");
 if (fs.existsSync(clientDist)) {
 	app.use(express.static(clientDist));
-	app.get(/^(?!\/(api|images)\/).*/, (_req, res) => {
+	app.get(/^(?!\/(api|images)(\/|$)).*/, (_req, res) => {
 		res.sendFile(path.join(clientDist, "index.html"));
 	});
 }

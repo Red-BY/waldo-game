@@ -13,7 +13,7 @@ The rectangular area on a Board where one named character is hidden.
 _Avoid_: Hitbox, target, coordinates
 
 **Game**:
-One timed attempt by a player to find every character on a Board, measured by the server from start to completion.
+One timed attempt by a player to find every character on a Board, measured by the server from start until the last character is found; a Game cannot be completed while any character is still hidden.
 _Avoid_: Round, run, session
 
 **Score**:

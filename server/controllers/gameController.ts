@@ -1,17 +1,18 @@
 import type { Request, Response } from "express";
 import fs from "node:fs/promises";
 import path from "node:path";
+import { parseBoardId } from "../lib/boardId.js";
 import { getBoardById, getCharacterNamesForBoard } from "../lib/db.js";
 import {
 	checkCharacterAtCoordinates,
 	completeServerTimer,
+	recordFoundCharacter,
 	startServerTimer,
 } from "../lib/game.js";
 
 export async function getGameDisplay(req: Request, res: Response) {
-	const boardNumber = Number(req.params.boardNumber);
-
-	if (!Number.isInteger(boardNumber) || boardNumber < 1) {
+	const boardNumber = parseBoardId(req.params.boardNumber);
+	if (boardNumber === null) {
 		return res.status(400).json({ error: "Invalid board number" });
 	}
 
@@ -37,10 +38,10 @@ export async function getGameDisplay(req: Request, res: Response) {
 }
 
 export async function checkCharacter(req: Request, res: Response) {
-	const boardNumber = Number(req.params.boardNumber);
+	const boardNumber = parseBoardId(req.params.boardNumber);
 	const { characterName, x, y } = req.body;
 
-	if (!Number.isInteger(boardNumber) || boardNumber < 1) {
+	if (boardNumber === null) {
 		return res.status(400).json({ error: "Invalid board number" });
 	}
 
@@ -58,13 +59,15 @@ export async function checkCharacter(req: Request, res: Response) {
 	}
 
 	const found = await checkCharacterAtCoordinates(board.name, characterName, x, y);
+	if (found) {
+		recordFoundCharacter(req.session, boardNumber, characterName);
+	}
 	return res.json({ found });
 }
 
 export async function completeGame(req: Request, res: Response) {
-	const boardNumber = Number(req.params.boardNumber);
-
-	if (!Number.isInteger(boardNumber) || boardNumber < 1) {
+	const boardNumber = parseBoardId(req.params.boardNumber);
+	if (boardNumber === null) {
 		return res.status(400).json({ error: "Invalid board number" });
 	}
 
@@ -73,9 +76,10 @@ export async function completeGame(req: Request, res: Response) {
 		return res.status(404).json({ error: "Board not found" });
 	}
 
-	const elapsedMs = completeServerTimer(req.session, boardNumber);
+	const requiredCharacters = await getCharacterNamesForBoard(boardNumber);
+	const elapsedMs = completeServerTimer(req.session, boardNumber, requiredCharacters);
 	if (elapsedMs === null) {
-		return res.status(400).json({ error: "No active game for this board" });
+		return res.status(400).json({ error: "No finished game for this board" });
 	}
 
 	return res.json({ elapsedMs });

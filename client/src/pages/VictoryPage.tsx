@@ -1,7 +1,7 @@
 import { useEffect, useState, type FormEvent } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
-import { MAX_PLAYER_NAME_LENGTH } from '@/lib/boards'
+import { MAX_PLAYER_NAME_LENGTH } from '@/lib/playerName'
 
 function formatElapsed(ms: number) {
   const totalSeconds = Math.floor(ms / 1000)

@@ -33,6 +33,8 @@ model CharacterLocation {
 
 model Score {
   id         Int    @id @default(autoincrement())
+  // The Game this Score came from; unique so a Game can only ever produce one Score.
+  gameId     String @unique
   boardId    Int
   board      Board  @relation(fields: [boardId], references: [id], onDelete: Cascade)
   playerName String
